@@ -1,13 +1,64 @@
-import os
 import csv
+import os
 
-election_data_csv = '/Users/ayokunleoluwole/Desktop/python-challenge/PyPoll/Resources/election_data.csv'
-with open(election_data_csv) as csvfile:
-    csvreader = csv.reader(csvfile, delimiter=',')
-    print(csvreader)
+file_to_load = "/Users/ayokunleoluwole/Desktop/python-challenge/PyPoll/Resources/election_data.csv"
+#to save 
+file_to_output = "/Users/ayokunleoluwole/Desktop/python-challenge/PyPoll/analysis/results.txt"
 
-    csv_header = next(csvreader)
-    print(f"CSV Header:{csv_header} ")
+total_votes = 0 
 
-    for row in csvreader:
-        print (row)
+candidate_options = []
+candidate_votes = {}
+
+winning_candidate = ""
+winning_count = 0 
+
+
+
+with open(file_to_load) as election_data:
+    reader = csv.DictReader(election_data)
+    
+    for row in reader:
+        total_votes = total_votes + 1
+
+        candidate_name = row ["Candidate"]
+        if candidate_name not in candidate_options:
+            candidate_options.append(candidate_name)
+
+            candidate_votes[candidate_name] = 0 
+
+        candidate_votes[candidate_name] = candidate_votes[candidate_name] + 1 
+#print(candidate_votes) 
+with open(file_to_output, "w") as txt_file:
+     
+    election_results = (
+        f"\n\nElection Results\n"
+        f"-------------------------\n"
+        f"Total Votes: {total_votes:,}\n"
+        f"-------------------------\n\n"
+     )
+
+    #print(election_results) 
+    print(election_results, end="")
+    txt_file.write(election_results)
+
+    for candidate in candidate_votes:
+
+        votes = candidate_votes.get(candidate)
+        vote_percentage = float(votes) / float(total_votes) * 100
+
+        if (votes > winning_count):
+            winning_count = votes 
+            winning_candidate  = candidate
+
+        voter_output = f"{candidate}: {vote_percentage: .3f}% ({votes})\n"
+        print(voter_output)
+
+        txt_file.write (voter_output)
+    winning_candidate_summ = (
+        f"-------------------------\n"
+        f"Winner: {winning_candidate}\n"
+       f"-------------------------\n"
+    )
+    print(winning_candidate_summ)
+    txt_file.write(winning_candidate_summ)
